@@ -23,6 +23,10 @@ app.use(express.static(path.join(baseDir, "public")));
 app.use("/api/social-links", socialLinksRouter);
 app.use("/api/assets", assetsRouter);
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(baseDir, "public", "index.html"));
+});
+
 app.get("/health", (req, res) => {
   res.json({ ok: true, message: "Servidor funcionando" });
 });
