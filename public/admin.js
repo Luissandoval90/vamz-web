@@ -16,6 +16,7 @@ function resolveApiBase() {
 const API_BASE = resolveApiBase();
 const ADMIN_PANEL_PASSWORD = "vamz-902050";
 const ADMIN_ACCESS_KEY = "admin_access_granted";
+let socialLinksCache = [];
 
 function apiUrl(path) {
   return `${API_BASE}${path}`;
@@ -31,6 +32,118 @@ function assetUrl(path) {
   }
 
   return path;
+}
+
+function setUploadStatus(progress, message, tone = "") {
+  const progressBar = document.getElementById("upload-progress-bar");
+  const progressValue = document.getElementById("upload-progress-value");
+  const statusText = document.getElementById("upload-status-text");
+
+  if (progressBar) {
+    progressBar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+  }
+  if (progressValue) {
+    progressValue.textContent = `${Math.round(Math.max(0, Math.min(100, progress)))}%`;
+  }
+  if (statusText) {
+    statusText.textContent = message;
+    statusText.classList.remove("is-ok", "is-error");
+    if (tone === "ok") {
+      statusText.classList.add("is-ok");
+    }
+    if (tone === "error") {
+      statusText.classList.add("is-error");
+    }
+  }
+}
+
+function setUploadProgressVisible(visible) {
+  const panel = document.querySelector(".upload-progress-panel");
+  if (!panel) {
+    return;
+  }
+  panel.classList.toggle("is-visible", Boolean(visible));
+}
+
+function uploadAssetWithProgress(formData) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", apiUrl("/api/assets"), true);
+    let fallbackProgress = 0;
+    let fallbackTimer = null;
+
+    const stopFallback = () => {
+      if (fallbackTimer) {
+        window.clearInterval(fallbackTimer);
+        fallbackTimer = null;
+      }
+    };
+
+    xhr.upload.onloadstart = () => {
+      setUploadProgressVisible(true);
+      setUploadStatus(3, "Preparando subida...");
+      fallbackTimer = window.setInterval(() => {
+        fallbackProgress = Math.min(88, fallbackProgress + 3);
+        setUploadStatus(fallbackProgress, `Subiendo... ${Math.round(fallbackProgress)}%`);
+      }, 180);
+    };
+
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) {
+        return;
+      }
+      stopFallback();
+      const percent = (event.loaded / event.total) * 100;
+      setUploadStatus(percent, `Subiendo... ${Math.round(percent)}%`);
+    };
+
+    xhr.onload = () => {
+      stopFallback();
+      const raw = xhr.responseText || "{}";
+      const body = (() => {
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return {};
+        }
+      })();
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        setUploadStatus(100, "Subida completada correctamente.", "ok");
+        resolve(body);
+        return;
+      }
+
+      const message = body.message || "No se pudo subir el recurso";
+      setUploadStatus(0, message, "error");
+      reject(new Error(message));
+    };
+
+    xhr.onerror = () => {
+      stopFallback();
+      const message = `Error de red al subir el recurso (API: ${apiUrl("/api/assets")})`;
+      setUploadStatus(0, message, "error");
+      reject(new Error(message));
+    };
+
+    xhr.onabort = () => {
+      stopFallback();
+      const message = "Subida cancelada";
+      setUploadStatus(0, message, "error");
+      reject(new Error(message));
+    };
+
+    xhr.send(formData);
+  });
+}
+
+async function checkBackendOnline() {
+  try {
+    const res = await fetch(apiUrl("/health"), { method: "GET" });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function fetchJSON(url, options = {}) {
@@ -82,6 +195,7 @@ async function ensureAdminAccess() {
 
 async function loadSocialLinks() {
   const links = await fetchJSON(apiUrl("/api/social-links"));
+  socialLinksCache = links;
   const container = document.getElementById("admin-social-list");
 
   if (!links.length) {
@@ -96,12 +210,33 @@ async function loadSocialLinks() {
         <p><strong>${link.platform}</strong></p>
         <p><a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a></p>
         <div class="actions">
+          <button data-edit-social="${link._id}">Editar</button>
           <button class="secondary" data-delete-social="${link._id}">Eliminar</button>
         </div>
       </article>
     `
     )
     .join("");
+}
+
+function resetSocialForm() {
+  const form = document.getElementById("social-form");
+  const submitBtn = document.getElementById("social-submit-btn");
+  const cancelBtn = document.getElementById("social-cancel-btn");
+  if (!form) {
+    return;
+  }
+
+  form.reset();
+  if (form.socialId) {
+    form.socialId.value = "";
+  }
+  if (submitBtn) {
+    submitBtn.textContent = "Guardar red social";
+  }
+  if (cancelBtn) {
+    cancelBtn.hidden = true;
+  }
 }
 
 async function loadAssets() {
@@ -139,38 +274,118 @@ document.getElementById("social-form").addEventListener("submit", async (e) => {
     url: form.url.value.trim(),
     icon: form.icon.value.trim()
   };
+  const socialId = form.socialId?.value?.trim();
 
-  await fetchJSON(apiUrl("/api/social-links"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  if (socialId) {
+    await fetchJSON(apiUrl(`/api/social-links/${socialId}`), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } else {
+    await fetchJSON(apiUrl("/api/social-links"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  }
 
-  form.reset();
+  resetSocialForm();
   await loadSocialLinks();
 });
+
+document.getElementById("social-cancel-btn").addEventListener("click", () => {
+  resetSocialForm();
+});
+
+function bindUploadPreview(inputId, labelId, emptyText) {
+  const input = document.getElementById(inputId);
+  const label = document.getElementById(labelId);
+  if (!input || !label) {
+    return;
+  }
+
+  input.addEventListener("change", () => {
+    const fileName = input.files && input.files[0] ? input.files[0].name : emptyText;
+    label.textContent = fileName;
+    if (inputId === "file") {
+      setUploadProgressVisible(Boolean(input.files && input.files.length));
+      if (input.files && input.files.length) {
+        setUploadStatus(0, "Archivo seleccionado. Listo para subir.");
+      } else {
+        setUploadStatus(0, "Esperando archivo para subir.");
+      }
+    }
+  });
+}
 
 document.getElementById("asset-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const form = e.currentTarget;
   const data = new FormData(form);
+  const backendOnline = await checkBackendOnline();
+  if (!backendOnline) {
+    setUploadProgressVisible(true);
+    const fallbackUrl = apiUrl("/") || "http://localhost:5000/";
+    setUploadStatus(
+      0,
+      `Backend no disponible. Inicia el servidor en ${fallbackUrl.replace(/\/$/, "")}`,
+      "error"
+    );
+    return;
+  }
 
-  await fetchJSON(apiUrl("/api/assets"), {
-    method: "POST",
-    body: data
-  });
-
-  form.reset();
-  await loadAssets();
+  setUploadStatus(0, "Iniciando subida...");
+  try {
+    await uploadAssetWithProgress(data);
+    form.reset();
+    const fileName = document.getElementById("file-name");
+    const imageName = document.getElementById("image-name");
+    if (fileName) {
+      fileName.textContent = "Ningun archivo seleccionado";
+    }
+    if (imageName) {
+      imageName.textContent = "Sin imagen seleccionada";
+    }
+    setUploadProgressVisible(false);
+    setUploadStatus(0, "Esperando archivo para subir.");
+    await loadAssets();
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 document.addEventListener("click", async (e) => {
+  const editSocialId = e.target.getAttribute("data-edit-social");
   const socialId = e.target.getAttribute("data-delete-social");
   const assetId = e.target.getAttribute("data-delete-asset");
 
+  if (editSocialId) {
+    const form = document.getElementById("social-form");
+    const submitBtn = document.getElementById("social-submit-btn");
+    const cancelBtn = document.getElementById("social-cancel-btn");
+    const link = socialLinksCache.find((item) => String(item._id) === String(editSocialId));
+    if (form && link) {
+      form.socialId.value = link._id;
+      form.platform.value = link.platform || "";
+      form.url.value = link.url || "";
+      form.icon.value = link.icon || "";
+      if (submitBtn) {
+        submitBtn.textContent = "Actualizar red social";
+      }
+      if (cancelBtn) {
+        cancelBtn.hidden = false;
+      }
+      form.platform.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    return;
+  }
+
   if (socialId) {
     await fetchJSON(apiUrl(`/api/social-links/${socialId}`), { method: "DELETE" });
+    resetSocialForm();
     await loadSocialLinks();
   }
 
@@ -188,6 +403,10 @@ document.addEventListener("click", async (e) => {
     }
 
     await Promise.all([loadSocialLinks(), loadAssets()]);
+    bindUploadPreview("file", "file-name", "Ningun archivo seleccionado");
+    bindUploadPreview("image", "image-name", "Sin imagen seleccionada");
+    setUploadProgressVisible(false);
+    setUploadStatus(0, "Esperando archivo para subir.");
   } catch (err) {
     console.error(err);
     alert(`${err.message}. Verifica que el backend este corriendo en http://localhost:5000`);
