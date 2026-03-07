@@ -309,12 +309,7 @@ function bindUploadPreview(inputId, labelId, emptyText) {
     const fileName = input.files && input.files[0] ? input.files[0].name : emptyText;
     label.textContent = fileName;
     if (inputId === "file") {
-      setUploadProgressVisible(Boolean(input.files && input.files.length));
-      if (input.files && input.files.length) {
-        setUploadStatus(0, "Archivo seleccionado. Listo para subir.");
-      } else {
-        setUploadStatus(0, "Esperando archivo para subir.");
-      }
+      setUploadStatus(0, input.files && input.files.length ? "Archivo seleccionado. Listo para subir." : "Esperando archivo para subir.");
     }
   });
 }
@@ -324,9 +319,9 @@ document.getElementById("asset-form").addEventListener("submit", async (e) => {
 
   const form = e.currentTarget;
   const data = new FormData(form);
+  setUploadProgressVisible(true);
   const backendOnline = await checkBackendOnline();
   if (!backendOnline) {
-    setUploadProgressVisible(true);
     const fallbackUrl = apiUrl("/") || "http://localhost:5000/";
     setUploadStatus(
       0,
@@ -341,15 +336,10 @@ document.getElementById("asset-form").addEventListener("submit", async (e) => {
     await uploadAssetWithProgress(data);
     form.reset();
     const fileName = document.getElementById("file-name");
-    const imageName = document.getElementById("image-name");
     if (fileName) {
       fileName.textContent = "Ningun archivo seleccionado";
     }
-    if (imageName) {
-      imageName.textContent = "Sin imagen seleccionada";
-    }
-    setUploadProgressVisible(false);
-    setUploadStatus(0, "Esperando archivo para subir.");
+    setUploadStatus(100, "Subida completada correctamente.", "ok");
     await loadAssets();
   } catch (error) {
     console.error(error);
@@ -404,7 +394,6 @@ document.addEventListener("click", async (e) => {
 
     await Promise.all([loadSocialLinks(), loadAssets()]);
     bindUploadPreview("file", "file-name", "Ningun archivo seleccionado");
-    bindUploadPreview("image", "image-name", "Sin imagen seleccionada");
     setUploadProgressVisible(false);
     setUploadStatus(0, "Esperando archivo para subir.");
   } catch (err) {

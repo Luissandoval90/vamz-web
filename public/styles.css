@@ -358,8 +358,9 @@ input[type="file"] {
 
 .asset-upload-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.8rem;
+  max-width: 420px;
 }
 
 .upload-card {
@@ -486,15 +487,12 @@ input[type="file"] {
   border-radius: 12px;
   background: rgba(12, 16, 25, 0.66);
   padding: 0.72rem;
-  display: grid;
+  display: none;
   gap: 0.45rem;
-  opacity: 0;
-  transform: translateY(4px);
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .upload-progress-panel.is-visible {
+  display: grid;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -1678,6 +1676,7 @@ textarea:focus-visible {
   .resource-grid {
     grid-template-columns: 1fr;
   }
+
 }
 
 @media (max-width: 760px) {

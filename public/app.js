@@ -208,6 +208,40 @@ function initAdminAccess() {
   });
 }
 
+function initBackgroundVideo() {
+  const video = document.querySelector(".bg-video");
+  if (!video) {
+    return;
+  }
+
+  const resume = () => {
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  };
+
+  video.addEventListener("canplay", resume);
+  video.addEventListener("ended", () => {
+    video.currentTime = 0;
+    resume();
+  });
+
+  // Si el stream remoto se corta, intenta recargar y continuar.
+  video.addEventListener("stalled", () => {
+    video.load();
+    resume();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && video.paused) {
+      resume();
+    }
+  });
+
+  resume();
+}
+
 function renderSocial(links) {
   const container = document.getElementById("social-list");
   if (!container) {
@@ -596,6 +630,7 @@ async function init() {
   try {
     initMenu();
     initAdminAccess();
+    initBackgroundVideo();
     initResourceSearch();
 
     const [socialRes, addonsRes, texturesRes] = await Promise.allSettled([
@@ -627,6 +662,7 @@ async function init() {
     }
   } catch (error) {
     console.error("Error en init:", error);
+    initBackgroundVideo();
     renderSocial([]);
     renderAssetsCarousel("addons-carousel", DEMO_ADDONS, false);
     renderAssetsCarousel("textures-carousel", DEMO_TEXTURES, true);

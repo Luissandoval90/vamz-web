@@ -3,6 +3,7 @@ const fs = require("fs");
 const express = require("express");
 const multer = require("multer");
 const { db } = require("../config/db");
+const { cloudinary, isCloudinaryConfigured } = require("../config/cloudinary");
 
 const router = express.Router();
 const uploadsDir = path.join(__dirname, "..", "uploads");
@@ -51,6 +52,30 @@ function stripTimestampPrefix(fileName) {
   return fileName.replace(/^\d+-/, "");
 }
 
+function isHttpUrl(value) {
+  return /^https?:\/\//i.test(String(value || "").trim());
+}
+
+async function uploadToCloudinary(localPath, folder) {
+  if (!isCloudinaryConfigured()) {
+    return "";
+  }
+
+  const result = await cloudinary.uploader.upload(localPath, {
+    folder,
+    resource_type: "auto"
+  });
+  return result.secure_url || "";
+}
+
+async function safeUnlink(filePath) {
+  try {
+    await fs.promises.unlink(filePath);
+  } catch {
+    // Ignorar errores de limpieza de temporales.
+  }
+}
+
 router.get("/", async (req, res, next) => {
   try {
     const { type } = req.query;
@@ -86,7 +111,7 @@ router.post(
   ]),
   async (req, res, next) => {
     try {
-      const { type, title, description } = req.body;
+      const { type, title, description, imageUrl } = req.body;
 
       if (!type || !title || !["addon", "texture"].includes(type)) {
         return res.status(400).json({ message: "type y title son obligatorios" });
@@ -94,9 +119,31 @@ router.post(
 
       const file = req.files?.file?.[0];
       const image = req.files?.image?.[0];
+      const inputImageUrl = String(imageUrl || "").trim();
 
-      const filePath = file ? `/uploads/${file.filename}` : "";
-      const imagePath = image ? `/uploads/${image.filename}` : "";
+      let filePath = "";
+      if (file) {
+        const cloudFileUrl = await uploadToCloudinary(file.path, "vamz/files");
+        if (cloudFileUrl) {
+          filePath = cloudFileUrl;
+          await safeUnlink(file.path);
+        } else {
+          filePath = `/uploads/${file.filename}`;
+        }
+      }
+
+      let imagePath = "";
+      if (isHttpUrl(inputImageUrl)) {
+        imagePath = inputImageUrl;
+      } else if (image) {
+        const cloudImageUrl = await uploadToCloudinary(image.path, "vamz/images");
+        if (cloudImageUrl) {
+          imagePath = cloudImageUrl;
+          await safeUnlink(image.path);
+        } else {
+          imagePath = `/uploads/${image.filename}`;
+        }
+      }
 
       if (!filePath) {
         return res.status(400).json({
@@ -140,6 +187,10 @@ router.get("/:id/download", async (req, res, next) => {
     }
 
     const filePath = row.file_path || "";
+    if (isHttpUrl(filePath)) {
+      return res.redirect(filePath);
+    }
+
     if (filePath && filePath.startsWith("/uploads/")) {
       const fileName = path.basename(filePath);
       const absolutePath = path.join(uploadsDir, fileName);

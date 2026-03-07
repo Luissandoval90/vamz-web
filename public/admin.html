@@ -97,6 +97,11 @@
               <textarea id="description" name="description"></textarea>
             </div>
 
+            <div>
+              <label for="imageUrl">URL de imagen de portada (opcional)</label>
+              <input id="imageUrl" name="imageUrl" type="url" placeholder="https://.../portada.jpg" />
+            </div>
+
             <div class="asset-upload-grid">
               <label class="upload-card upload-card-file" for="file">
                 <div class="upload-card-glow"></div>
@@ -114,26 +119,6 @@
                     </div>
                     <p class="upload-drop-title">Arrastra o haz click</p>
                     <p class="upload-drop-copy" id="file-name">Ningun archivo seleccionado</p>
-                  </div>
-                </div>
-              </label>
-
-              <label class="upload-card upload-card-image" for="image">
-                <div class="upload-card-glow"></div>
-                <div class="upload-card-content">
-                  <div class="upload-card-head">
-                    <h3>Imagen</h3>
-                    <p>Portada opcional del recurso</p>
-                  </div>
-                  <div class="upload-dropzone">
-                    <input id="image" name="image" type="file" accept="image/*" class="upload-card-input" />
-                    <div class="upload-drop-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                      </svg>
-                    </div>
-                    <p class="upload-drop-title">Arrastra o haz click</p>
-                    <p class="upload-drop-copy" id="image-name">Sin imagen seleccionada</p>
                   </div>
                 </div>
               </label>
@@ -163,8 +148,5 @@
 
     <script src="./admin.js"></script>
   </body>
-<<<<<<< HEAD
-</html>
-=======
 </html>
 >>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
