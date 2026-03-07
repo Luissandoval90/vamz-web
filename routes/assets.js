@@ -1,8 +1,5 @@
 const path = require("path");
-<<<<<<< HEAD
 const fs = require("fs");
-=======
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
 const express = require("express");
 const multer = require("multer");
 const { db } = require("../config/db");
@@ -41,7 +38,6 @@ function parseId(id) {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-<<<<<<< HEAD
 async function fileExists(filePath) {
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
@@ -55,8 +51,6 @@ function stripTimestampPrefix(fileName) {
   return fileName.replace(/^\d+-/, "");
 }
 
-=======
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
 router.get("/", async (req, res, next) => {
   try {
     const { type } = req.query;
@@ -91,52 +85,44 @@ router.post(
     { name: "image", maxCount: 1 }
   ]),
   async (req, res, next) => {
-  try {
-    const { type, title, description } = req.body;
+    try {
+      const { type, title, description } = req.body;
 
-    if (!type || !title || !["addon", "texture"].includes(type)) {
-      return res.status(400).json({ message: "type y title son obligatorios" });
-    }
+      if (!type || !title || !["addon", "texture"].includes(type)) {
+        return res.status(400).json({ message: "type y title son obligatorios" });
+      }
 
-    const file = req.files?.file?.[0];
-    const image = req.files?.image?.[0];
+      const file = req.files?.file?.[0];
+      const image = req.files?.image?.[0];
 
-    const filePath = file ? `/uploads/${file.filename}` : "";
-    const imagePath = image ? `/uploads/${image.filename}` : "";
+      const filePath = file ? `/uploads/${file.filename}` : "";
+      const imagePath = image ? `/uploads/${image.filename}` : "";
 
-    if (!filePath) {
-      return res.status(400).json({
-        message: "Debes subir un archivo desde la web"
+      if (!filePath) {
+        return res.status(400).json({
+          message: "Debes subir un archivo desde la web"
+        });
+      }
+
+      const insert = await db.execute({
+        sql: `INSERT INTO assets (type, title, description, file_path, image_path, external_url, created_at, updated_at)
+              VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+        args: [type, title.trim(), (description || "").trim(), filePath, imagePath, ""]
       });
+
+      const id = Number(insert.lastInsertRowid);
+      const row = await db.execute({
+        sql: `SELECT id, type, title, description, file_path, image_path, external_url, created_at, updated_at FROM assets WHERE id = ?`,
+        args: [id]
+      });
+
+      return res.status(201).json(mapAsset(row.rows[0]));
+    } catch (error) {
+      return next(error);
     }
-
-    const insert = await db.execute({
-      sql: `INSERT INTO assets (type, title, description, file_path, image_path, external_url, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-      args: [
-        type,
-        title.trim(),
-        (description || "").trim(),
-        filePath,
-        imagePath,
-        ""
-      ]
-    });
-
-    const id = Number(insert.lastInsertRowid);
-    const row = await db.execute({
-      sql: `SELECT id, type, title, description, file_path, image_path, external_url, created_at, updated_at FROM assets WHERE id = ?`,
-      args: [id]
-    });
-
-    return res.status(201).json(mapAsset(row.rows[0]));
-  } catch (error) {
-    return next(error);
   }
-}
 );
 
-<<<<<<< HEAD
 router.get("/:id/download", async (req, res, next) => {
   try {
     const id = parseId(req.params.id);
@@ -188,8 +174,6 @@ router.get("/:id/download", async (req, res, next) => {
   }
 });
 
-=======
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
 router.delete("/:id", async (req, res, next) => {
   try {
     const id = parseId(req.params.id);
@@ -213,8 +197,4 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
-<<<<<<< HEAD
 module.exports = router;
-=======
-module.exports = router;
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
