@@ -411,8 +411,4 @@ document.addEventListener("click", async (e) => {
     console.error(err);
     alert(`${err.message}. Verifica que el backend este corriendo en http://localhost:5000`);
   }
-<<<<<<< HEAD
 })();
-=======
-})();
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1

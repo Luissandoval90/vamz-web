@@ -433,14 +433,10 @@ function renderAssetsCarousel(containerId, assets, reverse = false) {
   const loopItems = [...assets, ...assets];
   const cards = loopItems
     .map((asset) => {
-<<<<<<< HEAD
       const hasLocalFile = Boolean(asset._id && asset.filePath && asset.filePath.startsWith("/uploads/"));
       const href = hasLocalFile
         ? apiUrl(`/api/assets/${asset._id}/download`)
         : assetUrl(asset.filePath || asset.externalUrl);
-=======
-      const href = assetUrl(asset.filePath || asset.externalUrl);
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
       const cover = assetUrl(asset.imagePath || asset.filePath || asset.externalUrl);
       const showCover = isImageFile(cover);
       const isPreview = Boolean(asset.preview);
@@ -492,14 +488,10 @@ function renderAssetsList(containerId, assets) {
 
   container.innerHTML = assets
     .map((asset, index) => {
-<<<<<<< HEAD
       const hasLocalFile = Boolean(asset._id && asset.filePath && asset.filePath.startsWith("/uploads/"));
       const href = hasLocalFile
         ? apiUrl(`/api/assets/${asset._id}/download`)
         : assetUrl(asset.filePath || asset.externalUrl);
-=======
-      const href = assetUrl(asset.filePath || asset.externalUrl);
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
       const cover = assetUrl(asset.imagePath || asset.filePath || asset.externalUrl);
       const fallbackKind = containerId.includes("texture") ? "Textura" : "Addon";
       const kind = asset.type === "texture" ? "Textura" : asset.type === "addon" ? "Addon" : fallbackKind;
@@ -644,8 +636,4 @@ async function init() {
   }
 }
 
-<<<<<<< HEAD
 init();
-=======
-init();
->>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1

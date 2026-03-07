@@ -170,28 +170,68 @@ h3,
 
 .menu-btn,
 .menu-admin {
+  --glow-color: rgba(242, 211, 155, 0.85);
+  --glow-spread-color: rgba(215, 181, 120, 0.24);
+  --enhanced-glow-color: rgb(255, 236, 198);
+  --btn-color: rgba(21, 27, 39, 0.96);
   width: auto;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 211, 155, 0.35);
-  background: rgba(18, 23, 33, 0.9);
-  color: var(--text);
+  border-radius: 1em;
+  border: 1px solid rgba(242, 211, 155, 0.45);
+  background-color: var(--btn-color);
+  color: var(--gold-2);
   text-decoration: none;
-  padding: 0.58rem 1rem;
+  padding: 0.52rem 1.1rem;
   font-family: "Cinzel", "Georgia", serif;
   font-weight: 700;
+  font-size: 0.95rem;
+  text-shadow: none;
+  box-shadow: 0 0 0.35em 0.02em rgba(242, 211, 155, 0.32), 0 0 0.9em 0.1em var(--glow-spread-color),
+    inset 0 0 0.22em 0.04em rgba(242, 211, 155, 0.32);
+  position: relative;
+  isolation: isolate;
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+.menu-btn::after,
+.menu-admin::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 120%;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: var(--glow-spread-color);
+  filter: blur(1.1em);
+  opacity: 0.2;
+  transform: perspective(1.5em) rotateX(35deg) scale(1, 0.42);
+  z-index: -1;
 }
 
 .menu-btn.active {
+  color: #2a1d10;
   background: linear-gradient(120deg, var(--gold), var(--gold-2));
-  color: #24170f;
-  border-color: transparent;
+  border-color: rgba(255, 236, 198, 0.72);
+  box-shadow: 0 0 0.55em 0.08em rgba(242, 211, 155, 0.48), 0 0 1.2em 0.2em rgba(215, 181, 120, 0.26),
+    inset 0 0 0.3em 0.08em rgba(255, 236, 198, 0.45);
 }
 
 .menu-btn:hover,
 .menu-admin:hover {
+  color: #2a1d10;
+  background: linear-gradient(120deg, var(--gold), var(--gold-2));
+  border-color: rgba(255, 236, 198, 0.72);
+  text-shadow: none;
+  box-shadow: 0 0 0.55em 0.08em rgba(242, 211, 155, 0.48), 0 0 1.2em 0.2em rgba(215, 181, 120, 0.26),
+    inset 0 0 0.3em 0.08em rgba(255, 236, 198, 0.45);
   transform: translateY(-1px);
+}
+
+.menu-btn:active,
+.menu-admin:active {
+  box-shadow: 0 0 0.4em 0.06em rgba(242, 211, 155, 0.42), 0 0 0.9em 0.16em rgba(215, 181, 120, 0.22),
+    inset 0 0 0.24em 0.07em rgba(255, 236, 198, 0.4);
 }
 
 .hero {
