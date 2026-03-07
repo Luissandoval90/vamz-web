@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VAMZ | Fantasy Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Manrope:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <video class="bg-video" autoplay muted loop playsinline preload="metadata">
+      <source src="./assets/bg-video.mp4" type="video/mp4" />
+    </video>
+    <div class="backdrop"></div>
+    <div class="grain"></div>
+
+    <header class="top-fixed-bar">
+      <p class="brand-mark">VAMZ ARCHIVE</p>
+      <div class="menu-group">
+        <button class="menu-btn active" data-view="principal" type="button">Principal</button>
+        <button class="menu-btn" data-view="recursos" type="button">Recursos</button>
+        <a class="menu-admin" href="./admin.html">Admin</a>
+      </div>
+    </header>
+
+    <main class="container page-stack">
+      <nav class="menu-nav panel">
+        <section id="menu-hero" class="menu-hero">
+          <div class="hero-copy">
+            <p class="kicker">Fantasy Creator Portal</p>
+            <h1>Donde mis redes y recursos cobran vida</h1>
+            <p class="hero-text">
+              Un portal inspirado en aventuras epicas para descubrir mis enlaces y colecciones
+              de addons y texturas.
+            </p>
+          </div>
+        </section>
+      </nav>
+
+      <section id="view-principal" class="view-block view-stack active-view">
+        <section class="panel animate-up delay-1">
+          <div class="section-head">
+            <h2>Redes Sociales</h2>
+            <p class="section-sub">Sigueme en mis plataformas principales.</p>
+          </div>
+          <div id="social-list" class="card-grid"></div>
+        </section>
+
+        <section class="panel animate-up delay-2">
+          <div class="section-head">
+            <h2>Recursos Destacados</h2>
+            <p class="section-sub">Carrusel en la pantalla principal.</p>
+          </div>
+
+          <div class="carousel-stack">
+            <article>
+              <h3 class="carousel-title">Addons</h3>
+              <div id="addons-carousel" class="carousel-shell"></div>
+            </article>
+
+            <article>
+              <h3 class="carousel-title">Texturas</h3>
+              <div id="textures-carousel" class="carousel-shell"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-recursos" class="view-block">
+        <section id="menu-recursos" class="panel animate-up delay-2 menu-section">
+          <div class="section-head">
+            <h2>Menu de Recursos</h2>
+            <p class="section-sub">Vista normal de todo lo publicado.</p>
+          </div>
+
+          <section class="resource-search-wrap" aria-label="Buscador de recursos">
+            <div class="resource-search-grid"></div>
+            <div class="resource-search-poda">
+              <div class="resource-search-glow"></div>
+              <div class="resource-search-dark-border-bg"></div>
+              <div class="resource-search-dark-border-bg"></div>
+              <div class="resource-search-dark-border-bg"></div>
+              <div class="resource-search-white"></div>
+              <div class="resource-search-border"></div>
+
+              <div class="resource-search-main">
+                <input
+                  id="resource-search"
+                  placeholder="Buscar addon o textura..."
+                  type="text"
+                  name="resource-search"
+                  class="resource-search-input"
+                />
+                <div class="resource-search-input-mask"></div>
+                <div class="resource-search-pink-mask"></div>
+                <div class="resource-search-filter-border"></div>
+                <div class="resource-search-filter-icon" aria-hidden="true">
+                  <svg preserveAspectRatio="none" height="27" width="27" viewBox="4.8 4.56 14.832 15.408" fill="none">
+                    <path
+                      d="M8.16 6.65002H15.83C16.47 6.65002 16.99 7.17002 16.99 7.81002V9.09002C16.99 9.56002 16.7 10.14 16.41 10.43L13.91 12.64C13.56 12.93 13.33 13.51 13.33 13.98V16.48C13.33 16.83 13.1 17.29 12.81 17.47L12 17.98C11.24 18.45 10.2 17.92 10.2 16.99V13.91C10.2 13.5 9.97 12.98 9.73 12.69L7.52 10.36C7.23 10.08 7 9.55002 7 9.20002V7.87002C7 7.17002 7.52 6.65002 8.16 6.65002Z"
+                      stroke="#d6d6e6"
+                      stroke-width="1"
+                      stroke-miterlimit="10"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="resource-search-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" height="24" fill="none">
+                    <circle stroke="url(#search)" r="8" cy="11" cx="11"></circle>
+                    <line stroke="url(#searchl)" y2="16.65" y1="22" x2="16.65" x1="22"></line>
+                    <defs>
+                      <linearGradient gradientTransform="rotate(50)" id="search">
+                        <stop stop-color="#f8e7f8" offset="0%"></stop>
+                        <stop stop-color="#b6a9b7" offset="50%"></stop>
+                      </linearGradient>
+                      <linearGradient id="searchl">
+                        <stop stop-color="#b6a9b7" offset="0%"></stop>
+                        <stop stop-color="#837484" offset="50%"></stop>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="resource-grid">
+            <article>
+              <h3 class="carousel-title">Addons Publicados</h3>
+              <div id="addons-list" class="card-grid resource-cards"></div>
+            </article>
+
+            <article>
+              <h3 class="carousel-title">Texturas Publicadas</h3>
+              <div id="textures-list" class="card-grid resource-cards"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
