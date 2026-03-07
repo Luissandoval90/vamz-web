@@ -49,4 +49,8 @@ Proyecto fullstack para publicar tus redes sociales y gestionar addons/texturas.
 
 - Las tablas se crean automaticamente al iniciar.
 - En `POST /api/assets` debes enviar archivo o `externalUrl`.
+<<<<<<< HEAD
 - Los archivos se guardan en `uploads/`.
+=======
+- Los archivos se guardan en `uploads/`.
+>>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1

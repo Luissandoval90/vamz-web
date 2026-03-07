@@ -54,4 +54,8 @@ async function connectDB() {
   console.log("Turso conectado correctamente.");
 }
 
+<<<<<<< HEAD
 module.exports = { db, connectDB };
+=======
+module.exports = { db, connectDB };
+>>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1

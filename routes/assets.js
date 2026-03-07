@@ -1,5 +1,8 @@
 const path = require("path");
+<<<<<<< HEAD
 const fs = require("fs");
+=======
+>>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
 const express = require("express");
 const multer = require("multer");
 const { db } = require("../config/db");
@@ -38,6 +41,7 @@ function parseId(id) {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
+<<<<<<< HEAD
 async function fileExists(filePath) {
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
@@ -51,6 +55,8 @@ function stripTimestampPrefix(fileName) {
   return fileName.replace(/^\d+-/, "");
 }
 
+=======
+>>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
 router.get("/", async (req, res, next) => {
   try {
     const { type } = req.query;
@@ -130,6 +136,7 @@ router.post(
 }
 );
 
+<<<<<<< HEAD
 router.get("/:id/download", async (req, res, next) => {
   try {
     const id = parseId(req.params.id);
@@ -181,6 +188,8 @@ router.get("/:id/download", async (req, res, next) => {
   }
 });
 
+=======
+>>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
 router.delete("/:id", async (req, res, next) => {
   try {
     const id = parseId(req.params.id);
@@ -204,4 +213,8 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> ba407b455010e21d62781ca2e701cf7ad61a8cf1
